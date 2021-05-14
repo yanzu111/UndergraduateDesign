@@ -33,19 +33,6 @@ if machine != 'PC':
 import threading
 import queue
 
-class QTThread(threading.Thread):
-    def __init__(self,threadID,name,q):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.q = q
-        
-    def run(self):
-        app = QtWidgets.QApplication(sys.argv)
-        window = mywindow(self.q)
-        window.show()
-        self.close(app.exec_())
-        print("退出线程："+ self.name)
 
 
 class B_pro_Thread(threading.Thread):
@@ -269,182 +256,6 @@ class mywindow(QtWidgets.QMainWindow,Ui_MainWindow):
 
 
 
-
-
-
-
-
-
-
-
-
-# class mywindow(QtWidgets.QMainWindow,Ui_MainWindow):
-#     def __init__(self,q):
-#         super(mywindow,self).__init__()
-        
-#         # 摄像头
-#         self.CAM_NUM = 0
-#         self.cap = cv2.VideoCapture() #初始化摄像头
-#         self.timerCamera = QTimer() #初始化定时器
-        
-#         # UI
-#         self.setupUi(self)
-#         desktop_geometry = QtWidgets.QApplication.desktop()           #获取屏幕大小
-#         main_window_width= desktop_geometry.width()                    #屏幕宽
-#         main_window_height = desktop_geometry.height()                 #屏幕高
-#         rect = self.geometry()                                         #获取窗口界面大小
-#         window_width = rect.width() #窗口界面的宽
-#         window_height = rect.height() #窗口界面的高
-#         x = (main_window_width - window_width) // 2 #计算窗口左上角点横坐标
-#         y = (main_window_height - window_height) //2#计算窗口左上角纵坐标
-
-#         self.setGeometry(x, y, window_width, window_height)
-
-#         # self.image_label.setScaledContents(True)    #让图片适应QLabel
-#         self.B1.setText('Open Camera')
-
-#         self.q = q;
-
-#         self.image_label.setGeometry(80, 60, 640, 480)
-
-#         self.init_imag();
-        
-#         # 槽连接
-#         # self.timerCamera.timeout.connect(self.showCamera)
-#         self.timerCamera.timeout.connect(self.showImage)
-#         self.B1.clicked.connect(self.cameraSwitch)
-#         # self.B1.clicked.connect(self.showImage)
-#         self.B2.clicked.connect(self.closeWindow)
-
-#         self.SPL = np.array(np.zeros((grid_y,grid_x)));
-#         self.setWindowFlags(Qt.FramelessWindowHint)# 无边框
-#         # self.setAttribute(Qt.WA_TranslucentBackground) #背景透明
-
-#         # self.Im = cv2.imread('dog.jpg')
-#         self.Im = cv2.imread('school.jpg')
-
-
-
-#     def showImage(self):
-#         # print('showImage');
-#         # SPL =np.array(np.zeros((grid_y,grid_x)))
-#         TH_Q_SPL_Lock.acquire()
-#         if not self.q.empty():
-#             self.SPL = self.q.get()
-#             TH_Q_SPL_Lock.release()
-#             # print ("%s processing %s" % (threadName, data))
-#             maxSPL = ceil(np.max(self.SPL));
-#             minSPL = floor(np.min(self.SPL))
-#             # minSPL = 0
-#             if (maxSPL==0):
-#                 maxSPL = minSPL + 1;
-                
-#             print("QT maxSPL=%f,minSPL=%f"%(maxSPL,minSPL))
-
-#             if(maxSPL-minSPL<6):
-#                 return
-                
-#             BF =1
-
-#             B2=np.kron(self.SPL,np.ones((20,20)))
-#             x2 = len(B2);
-#             y2 = len(B2[0,:])
-#             B21 = B2;
-#             B21[np.where(B21<maxSPL - BF)] =BF;
-#             B3 = np.array(np.zeros((x2,y2,3)))
-
-#             B3[:,:,0] = np.round((B2[:,:]-BF)*255/(maxSPL-BF))
-#             # B3[:,:,1] = np.round((B2[:,:]-minSPL)*0/(maxSPL-minSPL))
-#             # B3[:,:,2] = np.round((B2[:,:]-minSPL)*0/(maxSPL-minSPL))
-
-#             B3 = uint8(B3)
-#             image_height,image_width,image_depth = B3.shape ;    # 获取图像的高，宽以及深度。
-#             QIm = QImage(B3.data,image_width,image_height,       # 创建QImage格式的图像，并读入图像信息
-#             image_width * image_depth,
-#             QImage.Format_RGB888)
-#             # print("show B3")
-#             self.image_label.setPixmap(QPixmap.fromImage(QIm))
-
-#         else:
-#             TH_Q_SPL_Lock.release()
-#         # maxSPL = 1
-
-
-
-
-#     def showCamera(self):
-#         flag,Im = self.cap.read();
-#         image_height,image_width,image_depth = Im.shape ;    # 获取图像的高，宽以及深度。
-#         QIm = cv2.cvtColor(Im, cv2.COLOR_BGR2RGB);       # opencv读图片是BGR，qt显示要RGB，
-
-#         QIm = QImage(QIm.data,image_width,image_height,       # 创建QImage格式的图像，并读入图像信息
-#                         image_width * image_depth,
-#                         QImage.Format_RGB888)
-
-#         self.image_label.setPixmap(QPixmap.fromImage(QIm))
-
-#     def closeWindow(self):
-#         if self.timerCamera.isActive() == True:
-#             # self.closeCamera()
-#             self.closeDAS()
-#             # sys.exit(0);
-#         self.close()
-
-#     def cameraSwitch(self):
-#         if self.timerCamera.isActive() == False:
-#             self.startDAS();
-#         else:
-#             self.closeDAS();
-
-#     def startDAS(self):
-#         self.timerCamera.start(40)
-#         self.B1.setText('Close DAS')
-
-
-#     def closeDAS(self):
-#         self.timerCamera.stop();
-#         self.image_label.clear()
-#         self.B1.setText('Open DAS')
-#         self.init_imag()
-    
-#     def DASSwitch(self):
-#         if self.timerCamera.isActive() == False:
-#             self.startDAS();
-#         else:
-#             self.closeDAS();
-
-
-    
-#     def startCamera(self):
-#         flag = self.cap.open(self.CAM_NUM)
-#         if flag == False:
-#             mas = QMessageBox.Warning(self,u'Warning',u'Plz check camera!',
-#                 buttons = QMessageBox.Ok,
-#                 defaultButton = QMessageBox.Ok)
-#         else:
-#             self.timerCamera.start(10)
-#             self.B1.setText('Close Camera')
-
-#     def closeCamera(self):
-#         self.timerCamera.stop();
-#         self.cap.release()
-#         self.image_label.clear()
-#         self.B1.setText('Open Camera')
-#         self.init_imag()
-    
-
-#     def init_imag(self):
-#         # Im = cv2.imread('dog.jpg')
-#         Im = cv2.imread('school.jpg')
-
-#         image_height,image_width,image_depth = Im.shape     # 获取图像的高，宽以及深度。
-#         QIm = cv2.cvtColor(Im, cv2.COLOR_BGR2RGB)       # opencv读图片是BGR，qt显示要RGB，
-
-#         QIm = QImage(QIm.data,image_width,image_height,       # 创建QImage格式的图像，并读入图像信息
-#                         image_width * image_depth,
-#                         QImage.Format_RGB888)
-
-#         self.image_label.setPixmap(QPixmap.fromImage(QIm))
 
 
 
@@ -817,8 +628,6 @@ if __name__ == '__main__':
 ##########################################主进程线程定义##############################################
 
     # thread1 = myThread(1, "Thread-1",TH_Q_SPL)
-
-    # thread2 = QTThread(1, "Thread-1",TH_Q_SPL)
     # thread3 = B_pro_Thread(2, "Thread-2",q2,TH_Q_SPL)
 
     # thread3.setDaemon(True)
@@ -827,7 +636,6 @@ if __name__ == '__main__':
     # window.show()
 ##########################################启动线程################################################
     # thread1.start()
-    # thread2.start()
     # thread3.start()
 ##########################################启动进程###############################################
     start =time.time_ns();
@@ -861,63 +669,6 @@ if __name__ == '__main__':
     sys.exit(app.exec_())
 
     print("\t主进程退出")
-
-
-
-
-if __name__ =='__main4__':
-    q = Queue(3);
-    p1 = Process(target=read_imag,args=[q,])
-    num = 0;
-    p1.start()
-    start = time.time_ns();
-    while(True):
-        try:
-            img = q.get(True,2);
-        except Queue.Empty:
-            print('队列空')
-            break
-        cv2.imshow("dog",img)
-        cv2.waitKey(1)
-        num += 1;
-        end = time.time_ns();
-        runtime = end - start
-        print("Time:%d,%d"%(num,runtime));
-        if(runtime>1000000000):
-            cv2.destroyAllWindows();
-            os._exit(0);
-            break;
-
-if __name__=='__main5__':
-    dog = cv2.imread('dog.jpg')
-    B4 = dog[0:210,0:210,:]
-    cv2.imshow("dog",uint8(B4))
-    cv2.wait(1)
-
-
-if __name__=='__mainSpi__':
-    spi = spidev.SpiDev()
-    spi.open(0,0)
-    spi.max_speed_hz = 20000000
-
-    data_size = 1
-
-    start = time.time_ns()
-    spi.writebytes([0x02])
-    a=spi.readbytes(65536)
-    end = time.time_ns()
-    print('a=%s'%a)
-    print('Running time: %s ms'%((end-start)/1000000))
-
-
-if __name__ == '__mai__':
-    app = QtWidgets.QApplication(sys.argv)
-    window = mywindow()
-    window.show()
-    # window.B1.clicked.connect(B1_function)
-    sys.exit(app.exec_())
-
-#测试
 
 
 
